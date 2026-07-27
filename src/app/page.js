@@ -113,16 +113,16 @@ export default function Home() {
         <section className="relative flex h-dvh w-full items-center justify-center overflow-hidden">
           <div className="absolute inset-0 overflow-hidden">
             <Image
-              src="/hero-produce.jpg"
+              src="/hero-plate.jpg"
               alt=""
               fill
               priority
               sizes="100vw"
-              className="animation-pan object-cover"
+              className="animation-orbit object-cover object-[42%_42%] md:object-center"
             />
           </div>
-          <div className="pointer-events-none absolute inset-0 bg-void/55" />
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgba(8,9,10,0.72),transparent_80%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-void/45" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_58%_48%_at_50%_48%,rgba(8,9,10,0.78),transparent_82%)]" />
           <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-void/80 to-transparent" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-void/85 to-transparent" />
 
