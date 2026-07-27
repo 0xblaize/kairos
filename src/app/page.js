@@ -1,250 +1,186 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import Logo from "@/components/Logo";
+import { LogoMark } from "@/components/Logo";
 import HeroScene from "@/components/HeroScene";
-import useReveal from "@/hooks/useReveal";
-import useSmoothScroll from "@/hooks/useSmoothScroll";
 import { useProfile } from "@/context/ProfileContext";
 
-const STEPS = [
-  {
-    n: "01",
-    title: "Set your guardrails",
-    body: "Your diet and your allergies, once. From then on they sit underneath every single thing Kairos does.",
-  },
-  {
-    n: "02",
-    title: "Snap your fridge",
-    body: "One photo. No typing out what you have, no searching, no scrolling a recipe index you don't have the ingredients for.",
-  },
-  {
-    n: "03",
-    title: "Watch it filter",
-    body: "Anything unsafe is flagged and dropped before a recipe exists — and you are told exactly what was removed and why.",
-  },
-  {
-    n: "04",
-    title: "Cook hands-free",
-    body: "Full-screen steps, readable from across the kitchen, advanced with your voice while your hands are busy.",
-  },
-];
-
-const GATES = [
-  {
-    label: "Gate one",
-    title: "At the photo",
-    body: "Every ingredient the camera returns is screened against your profile before it is ever shown to you.",
-  },
-  {
-    label: "Gate two",
-    title: "At the prompt",
-    body: "The recipe model is told in its system prompt what it must never touch. Unsafe items are removed from its input entirely.",
-  },
-  {
-    label: "Gate three",
-    title: "At the plate",
-    body: "The finished recipe is screened again. If anything unsafe survived, Kairos refuses the recipe instead of serving it.",
-  },
+const NAV = [
+  { label: "How it works", href: "#how" },
+  { label: "Safety", href: "#safety" },
 ];
 
 export default function Home() {
   const router = useRouter();
   const { profile, hydrated } = useProfile();
-  const rootRef = useRef(null);
-  const pinRef = useRef(null);
-
-  useSmoothScroll();
-  useReveal(rootRef);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const heroRef = useRef(null);
 
   useEffect(() => {
-    const section = pinRef.current;
-    if (!section) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    let ctx;
-    Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(
-      ([{ gsap }, { ScrollTrigger }]) => {
-        gsap.registerPlugin(ScrollTrigger);
-        const cards = section.querySelectorAll("[data-gate]");
-        if (!cards.length) return;
-
-        ctx = gsap.context(() => {
-          const tl = gsap.timeline({
-            scrollTrigger: {
-              trigger: section,
-              start: "top top",
-              end: () => `+=${cards.length * 60}%`,
-              pin: true,
-              scrub: 0.6,
-            },
-          });
-
-          cards.forEach((card, i) => {
-            if (i === 0) {
-              gsap.set(card, { autoAlpha: 1, y: 0 });
-              return;
-            }
-            gsap.set(card, { autoAlpha: 0, y: 48 });
-            tl.to(cards[i - 1], { autoAlpha: 0, y: -40, duration: 0.5 }, i - 1).to(
-              card,
-              { autoAlpha: 1, y: 0, duration: 0.5 },
-              i - 1 + 0.25
-            );
-          });
-        }, section);
-      }
-    );
-
-    return () => ctx?.revert();
-  }, []);
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
 
   const go = () => router.push(hydrated && profile.onboarded ? "/kitchen" : "/onboarding");
 
   return (
-    <div ref={rootRef}>
-      <nav className="fixed inset-x-0 top-0 z-40 border-b border-line/40 bg-void/70 backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-4">
-          <Logo />
-          <button
-            type="button"
-            onClick={go}
-            className="rounded-full border border-line px-5 py-2 text-sm transition-colors hover:border-saffron/60 hover:text-saffron"
-          >
-            Open Kairos
-          </button>
-        </div>
-      </nav>
-
-      <main>
-        <section className="relative isolate flex min-h-dvh items-center overflow-hidden">
-          <HeroScene className="absolute inset-0 -z-10" />
-          <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-void/50 via-transparent to-void" />
-          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(8,9,10,0.92),transparent_75%)]" />
-
-          <div className="mx-auto w-full max-w-4xl px-5 pt-24 text-center">
-            <p className="rise text-xs tracking-[0.3em] text-saffron uppercase">
-              Zero-shot culinary engine
-            </p>
-
-            <h1 className="rise font-display mt-7 text-5xl leading-[1.02] sm:text-7xl lg:text-[5.75rem]">
-              Cook what you
-              <br />
-              already have.
-            </h1>
-
-            <p className="rise mx-auto mt-8 max-w-xl text-lg text-fog sm:text-xl">
-              Kairos reads your fridge from a single photo, strips out everything your
-              body can&apos;t take, and hands you a recipe you can cook without ever
-              touching the screen.
-            </p>
-
-            <div className="rise mt-11 flex flex-col items-center gap-4">
-              <button
-                type="button"
-                onClick={go}
-                className="rounded-full bg-saffron px-10 py-4 text-lg font-medium text-void transition-transform hover:scale-[1.03] active:scale-95"
-              >
-                Scan my fridge
-              </button>
-              <p className="text-sm text-fog">
-                No account. Your profile never leaves your device.
-              </p>
-            </div>
-          </div>
-
-          <div className="pointer-events-none absolute inset-x-0 bottom-8 flex justify-center">
-            <span className="text-[11px] tracking-[0.28em] text-fog uppercase">Scroll</span>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-6xl px-5 py-28 sm:py-36">
-          <h2 data-reveal className="font-display max-w-3xl text-4xl leading-tight sm:text-6xl">
-            Two things kill dinner: not knowing what you have, and not trusting what you
-            find.
-          </h2>
-          <p data-reveal className="mt-7 max-w-xl text-lg text-fog">
-            Kairos removes both. The camera handles the inventory. Your profile handles
-            the safety. You just cook.
-          </p>
-
-          <div
-            data-reveal-stagger
-            className="mt-20 grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2"
-          >
-            {STEPS.map((s) => (
-              <div key={s.n} className="bg-char p-8 sm:p-10">
-                <span className="font-display text-3xl text-saffron">{s.n}</span>
-                <h3 className="mt-5 text-xl font-medium">{s.title}</h3>
-                <p className="mt-3 text-fog">{s.body}</p>
-              </div>
+    <div className="relative min-h-dvh w-full overflow-x-hidden">
+      <header className="fixed inset-x-0 top-0 z-50">
+        <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-7">
+          <div className="hidden gap-8 text-xs font-bold tracking-[0.3em] text-white uppercase mix-blend-difference md:flex">
+            {NAV.map((n) => (
+              <a key={n.href} href={n.href} className="transition-opacity hover:opacity-50">
+                {n.label}
+              </a>
             ))}
           </div>
-        </section>
 
-        <section
-          ref={pinRef}
-          className="relative flex min-h-dvh items-center overflow-hidden border-y border-line bg-char"
-        >
-          <div className="mx-auto grid w-full max-w-6xl gap-14 px-5 lg:grid-cols-2 lg:items-center">
-            <div>
-              <p className="text-xs tracking-[0.28em] text-alarm uppercase">
-                The safety net
-              </p>
-              <h2 className="font-display mt-5 text-4xl leading-tight sm:text-5xl">
-                An allergen never has to be noticed to be blocked.
-              </h2>
-              <p className="mt-6 max-w-md text-fog">
-                Most apps ask you to read the ingredient list and catch the problem
-                yourself. Kairos assumes you shouldn&apos;t have to. Your restrictions are
-                enforced three separate times, and the last one can veto the whole recipe.
-              </p>
-            </div>
+          <a
+            href="/"
+            className="flex items-center gap-3 text-white mix-blend-difference"
+            aria-label="Kairos home"
+          >
+            <LogoMark className="h-7 w-7" accent="currentColor" />
+            <span className="font-display text-2xl tracking-[0.3em] md:text-3xl">
+              KAIROS
+            </span>
+          </a>
 
-            <div className="relative min-h-[19rem]">
-              {GATES.map((g) => (
-                <article
-                  key={g.label}
-                  data-gate
-                  className="absolute inset-x-0 top-0 rounded-3xl border border-alarm/25 bg-alarm/[0.05] p-8 sm:p-10"
-                >
-                  <p className="text-xs tracking-[0.24em] text-alarm uppercase">
-                    {g.label}
-                  </p>
-                  <h3 className="font-display mt-4 text-3xl">{g.title}</h3>
-                  <p className="mt-4 text-fog">{g.body}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-4xl px-5 py-32 text-center sm:py-44">
-          <h2 data-reveal className="font-display text-4xl leading-tight sm:text-6xl">
-            Your fridge already has dinner in it.
-          </h2>
-          <p data-reveal className="mx-auto mt-6 max-w-lg text-lg text-fog">
-            Kairos just has to look.
-          </p>
-          <div data-reveal className="mt-11">
+          <div className="flex items-center gap-8">
             <button
               type="button"
               onClick={go}
-              className="rounded-full bg-saffron px-10 py-4 text-lg font-medium text-void transition-transform hover:scale-[1.03] active:scale-95"
+              className="hidden text-xs font-bold tracking-[0.3em] text-white uppercase mix-blend-difference transition-opacity hover:opacity-50 md:block"
             >
-              Scan my fridge
+              Open app
             </button>
+            <button
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              aria-label="Open menu"
+              className="text-white mix-blend-difference md:hidden"
+            >
+              <svg viewBox="0 0 24 24" className="h-6 w-6">
+                <line x1="3" y1="7" x2="21" y2="7" stroke="currentColor" strokeWidth="2" />
+                <line x1="3" y1="17" x2="21" y2="17" stroke="currentColor" strokeWidth="2" />
+              </svg>
+            </button>
+          </div>
+        </nav>
+      </header>
+
+      <div
+        className={`fixed inset-0 z-60 flex flex-col items-center justify-center bg-void transition-transform duration-500 ease-out ${
+          menuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <button
+          type="button"
+          onClick={() => setMenuOpen(false)}
+          aria-label="Close menu"
+          className="absolute top-7 right-6 text-cream"
+        >
+          <svg viewBox="0 0 24 24" className="h-6 w-6">
+            <line x1="5" y1="19" x2="19" y2="5" stroke="currentColor" strokeWidth="2" />
+            <line x1="5" y1="5" x2="19" y2="19" stroke="currentColor" strokeWidth="2" />
+          </svg>
+        </button>
+
+        <div className="flex flex-col items-center gap-12 text-cream">
+          <span className="font-display text-4xl tracking-[0.3em]">KAIROS</span>
+          <nav className="flex flex-col items-center gap-8 text-sm font-bold tracking-[0.3em] uppercase">
+            {NAV.map((n) => (
+              <a key={n.href} href={n.href} onClick={() => setMenuOpen(false)}>
+                {n.label}
+              </a>
+            ))}
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false);
+                go();
+              }}
+            >
+              Open app
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      <main>
+        <section
+          ref={heroRef}
+          className="relative flex h-dvh w-full items-center justify-center overflow-hidden"
+        >
+          <HeroScene className="absolute inset-0" />
+          <div className="pointer-events-none absolute inset-0 bg-void/40" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_62%_54%_at_50%_50%,rgba(8,9,10,0.9),transparent_78%)]" />
+
+          <div className="relative z-10 w-full px-6 text-center text-cream">
+            <p className="mb-6 text-[10px] tracking-[0.5em] uppercase opacity-80 md:text-sm">
+              Zero-shot culinary engine
+            </p>
+
+            <h1 className="hero-text-shadow font-display mb-10 text-5xl font-normal tracking-[0.3em] sm:text-7xl md:text-8xl lg:text-[9rem]">
+              KAIROS
+            </h1>
+
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row md:gap-6">
+              <button
+                type="button"
+                onClick={go}
+                className="inline-block w-full border border-cream px-10 py-4 text-[10px] tracking-[0.3em] uppercase transition duration-500 hover:bg-cream hover:text-void sm:w-auto md:text-xs"
+              >
+                Scan my fridge
+              </button>
+              <a
+                href="#how"
+                className="inline-block w-full px-10 py-4 text-[10px] tracking-[0.3em] uppercase transition duration-500 hover:opacity-50 sm:w-auto md:text-xs"
+              >
+                How it works
+              </a>
+            </div>
+          </div>
+
+          <div className="absolute bottom-10 left-10 hidden text-xs tracking-[0.3em] text-cream uppercase opacity-60 md:block">
+            Photograph your fridge
+            <br />
+            Cook what is already there
+          </div>
+
+          <div className="absolute right-8 bottom-8 z-20">
+            <div className="group relative flex h-24 w-24 items-center justify-center md:h-36 md:w-36">
+              <div className="badge-spin absolute inset-0">
+                <svg viewBox="0 0 100 100" className="h-full w-full" overflow="visible">
+                  <defs>
+                    <path
+                      id="badgePath"
+                      d="M 50, 50 m -40, 0 a 40,40 0 1,1 80,0 a 40,40 0 1,1 -80,0"
+                    />
+                  </defs>
+                  <text
+                    fill="currentColor"
+                    className="text-cream"
+                    fontSize="9"
+                    letterSpacing="3"
+                  >
+                    <textPath href="#badgePath">
+                      • ALLERGY AWARE • ZERO TYPING • HANDS FREE
+                    </textPath>
+                  </text>
+                </svg>
+              </div>
+              <div className="relative z-10 text-cream">
+                <LogoMark className="h-7 w-7" accent="var(--color-saffron)" />
+              </div>
+              <div className="absolute inset-0 rounded-full bg-cream/5 backdrop-blur-[2px]" />
+            </div>
           </div>
         </section>
       </main>
-
-      <footer className="border-t border-line">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-12 sm:flex-row sm:items-center sm:justify-between">
-          <Logo />
-          <p className="text-sm text-fog">Kairos — the right moment to eat well.</p>
-        </div>
-      </footer>
     </div>
   );
 }

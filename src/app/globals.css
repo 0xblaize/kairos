@@ -64,6 +64,37 @@ html.lenis body {
   display: none;
 }
 
+@keyframes kairos-pan {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+
+.animation-pan {
+  animation: kairos-pan 20s ease-in-out infinite alternate;
+}
+
+@keyframes kairos-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.badge-spin {
+  animation: kairos-spin 15s linear infinite;
+}
+
+.tracking-headline {
+  letter-spacing: 0.3em;
+}
+
+.hero-text-shadow {
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
+}
+
 @keyframes kairos-rise {
   from {
     opacity: 0;
