@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LogoMark } from "@/components/Logo";
-import HeroScene from "@/components/HeroScene";
 import { useProfile } from "@/context/ProfileContext";
 
 const NAV = [
@@ -111,9 +111,20 @@ export default function Home() {
 
       <main>
         <section className="relative flex h-dvh w-full items-center justify-center overflow-hidden">
-          <HeroScene className="absolute inset-0" />
-          <div className="pointer-events-none absolute inset-0 bg-void/40" />
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_62%_54%_at_50%_50%,rgba(8,9,10,0.9),transparent_78%)]" />
+          <div className="absolute inset-0 overflow-hidden">
+            <Image
+              src="/hero-produce.jpg"
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="animation-pan object-cover"
+            />
+          </div>
+          <div className="pointer-events-none absolute inset-0 bg-void/55" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgba(8,9,10,0.72),transparent_80%)]" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-void/80 to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-void/85 to-transparent" />
 
           <div className="relative z-10 w-full px-6 text-center text-cream">
             <p className="mb-6 text-[10px] tracking-[0.5em] uppercase opacity-80 md:text-sm">
