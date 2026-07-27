@@ -1,21 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogoMark } from "@/components/Logo";
 import HeroScene from "@/components/HeroScene";
 import { useProfile } from "@/context/ProfileContext";
 
 const NAV = [
-  { label: "How it works", href: "#how" },
-  { label: "Safety", href: "#safety" },
+  { label: "Profile", href: "/profile" },
+  { label: "Kitchen", href: "/kitchen" },
 ];
 
 export default function Home() {
   const router = useRouter();
   const { profile, hydrated } = useProfile();
   const [menuOpen, setMenuOpen] = useState(false);
-  const heroRef = useRef(null);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -111,10 +110,7 @@ export default function Home() {
       </div>
 
       <main>
-        <section
-          ref={heroRef}
-          className="relative flex h-dvh w-full items-center justify-center overflow-hidden"
-        >
+        <section className="relative flex h-dvh w-full items-center justify-center overflow-hidden">
           <HeroScene className="absolute inset-0" />
           <div className="pointer-events-none absolute inset-0 bg-void/40" />
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_62%_54%_at_50%_50%,rgba(8,9,10,0.9),transparent_78%)]" />
@@ -137,10 +133,10 @@ export default function Home() {
                 Scan my fridge
               </button>
               <a
-                href="#how"
+                href="/profile"
                 className="inline-block w-full px-10 py-4 text-[10px] tracking-[0.3em] uppercase transition duration-500 hover:opacity-50 sm:w-auto md:text-xs"
               >
-                How it works
+                Set allergies
               </a>
             </div>
           </div>
