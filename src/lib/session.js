@@ -47,7 +47,16 @@ export async function readSession() {
   const [payload, mac] = raw.split(".");
   if (!payload || !mac) return null;
 
-  const expected = sign(payload, await sessionSecret());
+  // Runs on every guarded request. A missing secret means nobody is signed in,
+  // not that the whole app should fail closed with a crash.
+  let secret;
+  try {
+    secret = await sessionSecret();
+  } catch {
+    return null;
+  }
+
+  const expected = sign(payload, secret);
   const a = Buffer.from(mac);
   const b = Buffer.from(expected);
   if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
