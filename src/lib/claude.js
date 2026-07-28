@@ -7,7 +7,7 @@ export function hasKey() {
   return /^sk-ant-/.test(process.env.ANTHROPIC_API_KEY || "");
 }
 
-export async function callClaude({ system, messages, maxTokens = 2000 }) {
+export async function callClaude({ system, messages, maxTokens = 4000, effort }) {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) throw new Error("ANTHROPIC_API_KEY is not set");
 
@@ -18,7 +18,13 @@ export async function callClaude({ system, messages, maxTokens = 2000 }) {
       "x-api-key": key,
       "anthropic-version": "2023-06-01",
     },
-    body: JSON.stringify({ model: MODEL, max_tokens: maxTokens, system, messages }),
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: maxTokens,
+      system,
+      messages,
+      ...(effort ? { output_config: { effort } } : {}),
+    }),
   });
 
   if (!res.ok) {
@@ -27,6 +33,14 @@ export async function callClaude({ system, messages, maxTokens = 2000 }) {
   }
 
   const data = await res.json();
+
+  // Sonnet 5 thinks by default and those tokens draw from max_tokens. Running
+  // out mid-answer truncates the JSON, which would otherwise surface as an
+  // opaque parse failure further down the pipeline.
+  if (data.stop_reason === "max_tokens") {
+    throw new Error("The model ran out of room. Try again.");
+  }
+
   return (data.content || [])
     .filter((b) => b.type === "text")
     .map((b) => b.text)

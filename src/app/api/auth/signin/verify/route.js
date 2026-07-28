@@ -4,8 +4,14 @@ import { createSession, flowId, relyingParty } from "@/lib/session";
 
 export const runtime = "nodejs";
 
+async function readJsonBody(request) {
+  const text = await request.text();
+  if (!text) return {};
+  return JSON.parse(text);
+}
+
 export async function POST(request) {
-  const { response } = await request.json();
+  const { response } = await readJsonBody(request);
 
   const found = await findCredential(response?.id);
   if (!found) {

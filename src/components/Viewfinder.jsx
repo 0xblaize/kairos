@@ -14,10 +14,11 @@ export default function Viewfinder({ onImage, busy }) {
       const url = String(reader.result);
       const img = new window.Image();
       img.onload = () => {
-        // A modern phone photo base64-encodes to several megabytes, which the
-        // vision request cannot carry. 1280px on the long edge is plenty to
-        // recognise groceries.
-        const scale = Math.min(1, 1280 / Math.max(img.width, img.height));
+        // A raw phone photo base64-encodes to several megabytes, which the
+        // vision request cannot carry. 1568px on the long edge is the point
+        // past which the model gains no detail, so downscaling to it is free
+        // accuracy-wise and keeps small labels legible.
+        const scale = Math.min(1, 1568 / Math.max(img.width, img.height));
         const canvas = document.createElement("canvas");
         canvas.width = Math.round(img.width * scale);
         canvas.height = Math.round(img.height * scale);

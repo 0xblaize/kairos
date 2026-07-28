@@ -46,7 +46,8 @@ export async function POST(request) {
 
     const text = await callClaude({
       system: SYSTEM,
-      maxTokens: 1000,
+      maxTokens: 3000,
+      effort: "low",
       messages: [
         {
           role: "user",
