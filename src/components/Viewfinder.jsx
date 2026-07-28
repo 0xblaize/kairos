@@ -35,7 +35,7 @@ export default function Viewfinder({ onImage, busy }) {
         read(e.dataTransfer.files?.[0]);
       }}
       className={`relative isolate overflow-hidden rounded-[2rem] border transition-colors ${
-        dragging ? "border-saffron bg-saffron/5" : "border-line bg-char"
+        dragging ? "border-cream/60 bg-cream/5" : "border-line bg-char"
       }`}
     >
       <AmbientField className="pointer-events-none absolute inset-0 -z-10 opacity-70" />
@@ -45,10 +45,10 @@ export default function Viewfinder({ onImage, busy }) {
           type="button"
           disabled={busy}
           onClick={() => cameraRef.current?.click()}
-          className="group relative grid h-28 w-28 place-items-center rounded-full bg-saffron text-void transition-transform hover:scale-105 active:scale-95 disabled:opacity-60 sm:h-32 sm:w-32"
+          className="group relative grid h-28 w-28 place-items-center rounded-full bg-cream text-void transition-transform hover:scale-105 active:scale-95 disabled:opacity-60 sm:h-32 sm:w-32"
           aria-label="Take a photo of your fridge"
         >
-          <span className="pulse-ring absolute inset-0 rounded-full border-2 border-saffron" />
+          <span className="pulse-ring absolute inset-0 rounded-full border-2 border-cream" />
           {busy ? (
             <svg viewBox="0 0 24 24" className="h-9 w-9 animate-spin">
               <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2.5" opacity="0.25" />

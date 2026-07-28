@@ -7,7 +7,7 @@ export default function RecipeCard({ recipe, onStart, onRescan }) {
   return (
     <section className="rise overflow-hidden rounded-[2rem] border border-line bg-gradient-to-b from-elev to-char">
       <div className="border-b border-line px-6 py-7 sm:px-8">
-        <p className="text-xs tracking-[0.22em] text-saffron uppercase">Kairos choice</p>
+        <p className="text-xs tracking-[0.22em] text-cream/60 uppercase">Kairos choice</p>
         <h2 className="font-display mt-2.5 text-4xl leading-tight sm:text-5xl">
           {recipe.title}
         </h2>
@@ -67,7 +67,7 @@ export default function RecipeCard({ recipe, onStart, onRescan }) {
         <button
           type="button"
           onClick={onStart}
-          className="flex-1 rounded-full bg-saffron px-8 py-4 text-lg font-medium text-void transition-transform hover:scale-[1.01] active:scale-95"
+          className="flex-1 rounded-full bg-cream px-8 py-4 text-lg font-medium text-void transition-transform hover:scale-[1.01] active:scale-95"
         >
           Start cooking
         </button>

@@ -95,7 +95,7 @@ export default function CookMode({ recipe, onExit }) {
     <div className="fixed inset-0 z-50 flex flex-col bg-void">
       <div className="h-1 w-full bg-line">
         <div
-          className="h-full bg-saffron transition-[width] duration-500 ease-out"
+          className="h-full bg-cream transition-[width] duration-500 ease-out"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -139,7 +139,7 @@ export default function CookMode({ recipe, onExit }) {
         {step && (
           <div key={index} className="rise mx-auto w-full max-w-4xl">
             {step.minutes > 0 && (
-              <p className="text-lg tracking-wide text-saffron">
+              <p className="text-lg tracking-wide text-cream/60">
                 about {step.minutes} min
               </p>
             )}
@@ -173,7 +173,7 @@ export default function CookMode({ recipe, onExit }) {
         <button
           type="button"
           onClick={last ? onExit : next}
-          className="flex-1 rounded-full bg-saffron px-8 py-5 text-xl font-medium text-void transition-transform active:scale-[0.98]"
+          className="flex-1 rounded-full bg-cream px-8 py-5 text-xl font-medium text-void transition-transform active:scale-[0.98]"
         >
           {last ? "Finish" : "Next step"}
         </button>

@@ -12,7 +12,7 @@ export default function ShieldCluster({ href = "/profile" }) {
   return (
     <Link
       href={href}
-      className="group flex items-center gap-2 rounded-full border border-line bg-elev/70 py-1.5 pr-3 pl-2 backdrop-blur transition-colors hover:border-saffron/50"
+      className="group flex items-center gap-2 rounded-full border border-line bg-elev/70 py-1.5 pr-3 pl-2 backdrop-blur transition-colors hover:border-cream/30"
       aria-label="Edit dietary and allergy profile"
     >
       {active.length === 0 && (!diet || diet.id === "none") ? (

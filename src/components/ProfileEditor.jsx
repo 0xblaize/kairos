@@ -31,7 +31,7 @@ export default function ProfileEditor({ mode = "onboarding" }) {
 
       {showDiet && (
         <section className="rise">
-          <p className="text-xs tracking-[0.22em] text-saffron uppercase">
+          <p className="text-xs tracking-[0.22em] text-cream/60 uppercase">
             {isOnboarding ? "Step 1 of 2" : "Diet"}
           </p>
           <h1 className="font-display mt-3 text-4xl leading-tight sm:text-5xl">
@@ -52,7 +52,7 @@ export default function ProfileEditor({ mode = "onboarding" }) {
                   aria-pressed={on}
                   className={`rounded-2xl border px-4 py-3.5 text-left transition-all ${
                     on
-                      ? "border-saffron bg-saffron/10"
+                      ? "border-cream bg-cream/10"
                       : "border-line bg-elev/50 hover:border-fog/40"
                   }`}
                 >
@@ -141,7 +141,7 @@ export default function ProfileEditor({ mode = "onboarding" }) {
             <button
               type="button"
               onClick={finish}
-              className="rounded-full bg-saffron px-7 py-3.5 font-medium text-void transition-transform hover:scale-[1.02] active:scale-95"
+              className="rounded-full bg-cream px-7 py-3.5 font-medium text-void transition-transform hover:scale-[1.02] active:scale-95"
             >
               {profile.allergies.length ? "Save and start cooking" : "No allergies — continue"}
             </button>
@@ -152,7 +152,7 @@ export default function ProfileEditor({ mode = "onboarding" }) {
           <button
             type="button"
             onClick={() => router.push("/kitchen")}
-            className="rounded-full bg-saffron px-7 py-3.5 font-medium text-void transition-transform hover:scale-[1.02] active:scale-95"
+            className="rounded-full bg-cream px-7 py-3.5 font-medium text-void transition-transform hover:scale-[1.02] active:scale-95"
           >
             Done
           </button>

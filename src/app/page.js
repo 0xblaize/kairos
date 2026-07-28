@@ -181,7 +181,7 @@ export default function Home() {
                 </svg>
               </div>
               <div className="relative z-10 text-cream">
-                <LogoMark className="h-7 w-7" accent="var(--color-saffron)" />
+                <LogoMark className="h-7 w-7" accent="currentColor" />
               </div>
               <div className="absolute inset-0 rounded-full bg-cream/5 backdrop-blur-[2px]" />
             </div>

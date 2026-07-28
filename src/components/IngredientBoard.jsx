@@ -82,7 +82,7 @@ export default function IngredientBoard({ entries, onRemove, onAdd, onGenerate, 
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Missed something? Add it here"
-          className="w-full rounded-full border border-line bg-elev/60 px-4 py-2.5 text-sm outline-none transition-colors placeholder:text-fog/70 focus:border-saffron"
+          className="w-full rounded-full border border-line bg-elev/60 px-4 py-2.5 text-sm outline-none transition-colors placeholder:text-fog/70 focus:border-cream/40"
         />
       </form>
 
@@ -112,7 +112,7 @@ export default function IngredientBoard({ entries, onRemove, onAdd, onGenerate, 
         type="button"
         onClick={onGenerate}
         disabled={busy || safe.length === 0}
-        className="mt-7 w-full rounded-full bg-saffron px-8 py-4 font-medium text-void transition-transform hover:scale-[1.01] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+        className="mt-7 w-full rounded-full bg-cream px-8 py-4 font-medium text-void transition-transform hover:scale-[1.01] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
       >
         {busy ? "Building your recipe…" : "Generate recipe"}
       </button>

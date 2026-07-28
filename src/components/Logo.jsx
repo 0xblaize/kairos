@@ -1,4 +1,4 @@
-export function LogoMark({ className = "h-9 w-9", accent = "var(--color-saffron)" }) {
+export function LogoMark({ className = "h-9 w-9", accent = "var(--color-cream)" }) {
   return (
     <svg viewBox="0 0 48 48" fill="none" className={className} aria-hidden="true">
       <path
