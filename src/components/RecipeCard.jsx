@@ -2,6 +2,7 @@
 
 export default function RecipeCard({ recipe, onStart, onRescan }) {
   const total = (recipe.prepMinutes || 0) + (recipe.cookMinutes || 0);
+  const media = recipe.media;
   const m = recipe.macros || {};
 
   return (
@@ -21,6 +22,25 @@ export default function RecipeCard({ recipe, onStart, onRescan }) {
           <span>Serves {recipe.servings}</span>
         </div>
       </div>
+
+      {media?.url && (
+        <div className="border-b border-line bg-elev/30 px-6 py-6 sm:px-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-[10px] tracking-[0.4em] text-cream/40 uppercase">Prefer to watch?</p>
+              <p className="mt-2 text-sm text-cream/70">Open a video guide for this dish while you cook.</p>
+            </div>
+            <a
+              href={media.url}
+              target="_blank"
+              rel="noreferrer"
+              className="shrink-0 border border-cream px-5 py-3 text-center text-[10px] tracking-[0.25em] uppercase transition-colors hover:bg-cream hover:text-void"
+            >
+              Find video
+            </a>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-4 divide-x divide-line border-b border-line">
         {[["Cal", m.calories, ""], ["Protein", m.protein, "g"], ["Carbs", m.carbs, "g"], ["Fat", m.fat, "g"]].map(

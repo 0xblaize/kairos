@@ -1,10 +1,11 @@
 import { callClaude, extractJson, hasKey } from "@/lib/claude";
 import { screenAll, allergenLabel, dietLabel } from "@/lib/diet";
+import { findDish, getDishAvailability, videoSearchUrl } from "@/lib/dishes";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-function buildSystem(profile, safeNames) {
+function buildSystem(profile, safeNames, dish) {
   const allergies = [
     ...(profile.allergies || []).map(allergenLabel),
     ...(profile.customAllergies || []),
@@ -33,6 +34,17 @@ function buildSystem(profile, safeNames) {
     lines.push(`The recipe must be strictly ${dietLabel(profile.diet)}.`, "");
   }
 
+  if (dish) {
+    lines.push(
+      `The user selected ${dish.title}, a ${dish.cuisine} dish.`,
+      "Make that dish, not a different generic recipe.",
+      `Its required ingredient groups are: ${dish.required.map((group) => `${group.label} (${group.aliases.join(" / ")})`).join(", ")}.`,
+      "Every required group is already represented by a safe available ingredient.",
+      "Do not add missing ingredients or unsafe substitutions.",
+      ""
+    );
+  }
+
   lines.push(
     "You may additionally assume basic seasonings: salt, black pepper, water.",
     "Never invent an ingredient that is not on the list. If the list is too sparse for a real dish,",
@@ -58,11 +70,11 @@ function buildSystem(profile, safeNames) {
   return lines.join("\n");
 }
 
-function demoRecipe(safeNames) {
+function demoRecipe(safeNames, dish) {
   return {
-    title: "Spinach & Feta Frittata",
+    title: dish?.title || "Spinach & Feta Frittata",
     description:
-      "A fast, high-protein skillet frittata built from what you already had in the fridge.",
+      dish?.description || "A fast, high-protein skillet frittata built from what you already had in the fridge.",
     prepMinutes: 8,
     cookMinutes: 14,
     servings: 2,
@@ -90,7 +102,12 @@ function demoRecipe(safeNames) {
 
 export async function POST(request) {
   try {
-    const { ingredients = [], profile = {} } = await request.json();
+    const { ingredients = [], profile = {}, dishId = null } = await request.json();
+    const dish = dishId ? findDish(dishId) : null;
+
+    if (dishId && !dish) {
+      return Response.json({ error: "That dish is not available." }, { status: 404 });
+    }
 
     // Re-screen server-side. The client already filtered, but the recipe route
     // must never trust its input for an allergy decision.
@@ -105,12 +122,26 @@ export async function POST(request) {
       );
     }
 
+    if (dish) {
+      const availability = getDishAvailability(dish, safe, profile);
+      if (!availability.available) {
+        return Response.json(
+          { error: `${dish.title} needs ${availability.missing.join(", ")}.` },
+          { status: 422 }
+        );
+      }
+    }
+
+    const media = dish?.videoQuery
+      ? { title: `${dish.title} video`, url: videoSearchUrl(dish.videoQuery) }
+      : null;
+
     if (!hasKey()) {
-      return Response.json({ recipe: demoRecipe(safe), excluded, demo: true });
+      return Response.json({ recipe: demoRecipe(safe, dish), excluded, media, demo: true });
     }
 
     const text = await callClaude({
-      system: buildSystem(profile, safe),
+      system: buildSystem(profile, safe, dish),
       maxTokens: 6000,
       effort: "low",
       messages: [
@@ -141,7 +172,7 @@ export async function POST(request) {
       );
     }
 
-    return Response.json({ recipe, excluded });
+    return Response.json({ recipe, excluded, media });
   } catch (err) {
     return Response.json(
       { error: err.message || "Could not build a recipe." },

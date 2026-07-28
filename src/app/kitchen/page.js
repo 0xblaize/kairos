@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogoMark } from "@/components/Logo";
 import ShieldCluster from "@/components/ShieldCluster";
@@ -10,6 +10,8 @@ import RecipeCard from "@/components/RecipeCard";
 import CookMode from "@/components/CookMode";
 import { useProfile } from "@/context/ProfileContext";
 import { screenAll, screenIngredient } from "@/lib/diet";
+import { getAvailableDishes } from "@/lib/dishes";
+import DishOptions from "@/components/DishOptions";
 
 export default function KitchenPage() {
   const router = useRouter();
@@ -22,6 +24,12 @@ export default function KitchenPage() {
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState(null);
   const [demo, setDemo] = useState(false);
+  const [selectedDishId, setSelectedDishId] = useState(null);
+
+  const dishOptions = useMemo(
+    () => (entries ? getAvailableDishes(entries, profile) : []),
+    [entries, profile]
+  );
 
   useEffect(() => {
     if (hydrated && !profile.onboarded) router.replace("/onboarding");
@@ -32,6 +40,10 @@ export default function KitchenPage() {
       prev ? screenAll(prev.map((e) => e.name), profile) : prev
     );
   }, [profile]);
+
+  const activeDishId = dishOptions.some(({ dish }) => dish.id === selectedDishId)
+    ? selectedDishId
+    : null;
 
   if (!hydrated) return null;
 
@@ -91,9 +103,10 @@ export default function KitchenPage() {
       const data = await postJson("/api/recipe", {
         ingredients: entries.filter((e) => e.safe).map((e) => e.name),
         profile,
+        dishId: activeDishId,
       });
       if (data.demo) setDemo(true);
-      setRecipe(data.recipe);
+      setRecipe(data.recipe ? { ...data.recipe, media: data.media } : null);
     } catch (e) {
       setError(e.message || "Could not build a recipe.");
     } finally {
@@ -105,6 +118,7 @@ export default function KitchenPage() {
     setPhoto(null);
     setEntries(null);
     setRecipe(null);
+    setSelectedDishId(null);
     setError(null);
   };
 
@@ -190,13 +204,20 @@ export default function KitchenPage() {
 
             <div>
               {!recipe && (
-                <IngredientBoard
-                  entries={entries}
-                  busy={busy === "recipe"}
-                  onRemove={(i) => setEntries((p) => p.filter((_, x) => x !== i))}
-                  onAdd={(name) => setEntries((p) => [...p, screenIngredient(name, profile)])}
-                  onGenerate={generate}
-                />
+                <>
+                  <IngredientBoard
+                    entries={entries}
+                    busy={busy === "recipe"}
+                    onRemove={(i) => setEntries((p) => p.filter((_, x) => x !== i))}
+                    onAdd={(name) => setEntries((p) => [...p, screenIngredient(name, profile)])}
+                    onGenerate={generate}
+                  />
+                  <DishOptions
+                    options={dishOptions}
+                    selectedId={activeDishId}
+                    onSelect={setSelectedDishId}
+                  />
+                </>
               )}
 
               {recipe && (
