@@ -129,21 +129,28 @@ export function findDish(id) {
   return DISHES.find((dish) => dish.id === id) || null;
 }
 
-export function getDishAvailability(dish, ingredients, profile = {}) {
+export function getDishIngredients(dish, ingredients, profile = {}) {
   const safeNames = (ingredients || [])
     .map((entry) => (typeof entry === "string" ? entry : entry?.name))
     .filter(Boolean)
     .filter((name) => screenIngredient(name, profile).safe);
 
+  return safeNames.filter((name) =>
+    dish.required.some((group) => matchesAlias(name, group.aliases))
+  );
+}
+
+export function getDishAvailability(dish, ingredients, profile = {}) {
+  const matched = getDishIngredients(dish, ingredients, profile);
   const missing = dish.required
-    .filter((group) => !safeNames.some((name) => matchesAlias(name, group.aliases)))
+    .filter((group) => !matched.some((name) => matchesAlias(name, group.aliases)))
     .map((group) => group.label);
 
   return {
     dish,
     available: missing.length === 0,
     missing,
-    matched: safeNames,
+    matched,
   };
 }
 

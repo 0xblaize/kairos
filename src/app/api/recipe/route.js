@@ -1,6 +1,6 @@
 import { callClaude, extractJson, hasKey } from "@/lib/claude";
 import { screenAll, allergenLabel, dietLabel } from "@/lib/diet";
-import { findDish, getDishAvailability, videoSearchUrl } from "@/lib/dishes";
+import { findDish, getDishAvailability, getDishIngredients, videoSearchUrl } from "@/lib/dishes";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -148,16 +148,17 @@ export async function POST(request) {
       }
     }
 
+    const recipeNames = dish ? getDishIngredients(dish, safe, profile) : safe;
     const media = dish?.videoQuery
       ? { title: `${dish.title} video`, url: videoSearchUrl(dish.videoQuery) }
       : null;
 
     if (!hasKey()) {
-      return Response.json({ recipe: demoRecipe(safe, dish), excluded, media, demo: true });
+      return Response.json({ recipe: demoRecipe(recipeNames, dish), excluded, media, demo: true });
     }
 
     const text = await callClaude({
-      system: buildSystem(profile, safe, dish),
+      system: buildSystem(profile, recipeNames, dish),
       maxTokens: 6000,
       effort: "low",
       messages: [

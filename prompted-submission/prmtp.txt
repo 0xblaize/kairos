@@ -1,89 +1,39 @@
-# Prompted — Share a Build submission
+What kind of post is this?
 
-## What kind of post is this?
 Share a Build
 
-## What did you build?
-Kairos is an AI-powered, zero-waste cooking app where you snap a photo of the random ingredients in your fridge and kitchen. The AI automatically identifies the food, aggressively filters out your allergies or dietary restrictions, and generates a custom, step-by-step recipe so you can cook exactly what you have without decision fatigue.
+What did you build?
 
-Users create a passwordless passkey account, choose their diet and allergies, then add up to five kitchen photos in one scan. Claude identifies ingredients across every image, Kairos filters unsafe items before recipe generation, and returns an interactive step-by-step recipe with a hands-free Cook Mode.
+Kairos is an AI powered zero waste cooking app. Take a photo of the ingredients in your fridge or kitchen and get a safe recipe from what you already have.
 
-## Category
-Food & Cooking, AI, Web App
+Category
 
-## Explain your post
-I built Kairos because figuring out what to cook from what is already at home is annoying — and it gets more serious when allergies or dietary restrictions are involved.
+Food and Cooking
+AI
+Web App
 
-The workflow is deliberately simple:
+Explain your post
 
-1. Create a passkey — no passwords or usernames required to sign in.
-2. Choose a diet and tap common allergies, or use “Add another allergy” to type a custom one such as sesame.
-3. Take or upload up to five images of a fridge, pantry, or counter.
-4. Kairos compresses the images in the browser, sends them together to Claude Vision, and combines the detected ingredients into one list.
-5. Every ingredient is screened against the user profile before a recipe is generated.
-6. Claude creates a practical recipe using only safe, available ingredients.
-7. A final server-side safety gate rejects a recipe if the model reintroduces an unsafe ingredient.
+Kairos identifies food from up to five kitchen photos, removes ingredients that conflict with allergies or diet choices, and creates a simple step by step recipe. Users can choose preset allergies or type their own. The recipe is checked again before it is shown so unsafe ingredients are not added back.
 
-I added three safety layers rather than trusting a single model response:
+The Prompt You Used
 
-- ingredient screening immediately after vision extraction;
-- explicit allergy and diet constraints in the recipe prompt;
-- a deterministic server-side re-screen of every generated recipe ingredient.
+Build Kairos, an AI cooking app where users photograph food in their fridge, pantry, or kitchen. Identify the ingredients, remove anything unsafe for their allergies or dietary restrictions, and create a step by step recipe using what they have.
 
-The image flow is built for real phone photos: the browser downsizes each photo to a 1568px long edge, converts it to JPEG at 0.82 quality, then uploads base64 data. This keeps uploads below the API size limit while retaining enough detail for labels and items at the back of a fridge. The server accepts up to five photos, merges the model result, lowercases and deduplicates ingredient names, and caps the final list at 40 ingredients.
+Add passkey sign in, mobile and desktop support, custom typed allergies, and multiple photo uploads. Keep the design black and cream only.
 
-The UI is designed for mobile and desktop in a strict black-and-cream monochrome system. Allergy warnings stay red on purpose; they are a safety signal, not decoration.
+Link to your build
 
-## The Prompt You Used
-
-### 1. Build direction
-Build a project called Kairos: a zero-shot culinary engine. A user photographs their fridge, pantry, or countertop; AI identifies the ingredients; strict dietary and allergy guardrails filter them; then AI generates an interactive step-by-step recipe with a hands-free Cook Mode.
-
-Use a black-and-cream monochrome visual system only. Do not use yellow, saffron, gold, or amber as accents. Make it work well on both mobile and desktop.
-
-### 2. Authentication
-Add authentication using passkeys, not passwords. Users should be able to register and sign in with device biometrics or a device PIN. Reuse the Kairos logo for the app icon too.
-
-### 3. Reliability
-Fix: “Failed to execute 'json' on 'Response': Unexpected end of JSON input”. Make failed upload and non-JSON server responses show a clear message instead of crashing the interface.
-
-### 4. AI and image processing
-Prepare the environment variables needed for the AI part. Explain and harden how images are processed before they are sent for analysis.
-
-### 5. Performance and safety
-Increase response speed as much as possible. Make requests feel like one-click actions. Add another allergy button so users can type an allergy. Add the ability to add multiple images before sending them together for AI analysis.
-
-## Tools used
-
-- Claude Sonnet 5 via the Anthropic Messages API for ingredient vision and recipe generation
-- Next.js 16 / React 19
-- Tailwind CSS 4
-- SimpleWebAuthn for passkey registration and sign-in
-- Neon / Vercel Postgres design for serverless-safe passkey credentials and temporary WebAuthn challenges
-- Canvas API and FileReader for client-side image downscaling and JPEG conversion
-
-## Result
-
-Kairos turns a handful of fridge and pantry photos into a recipe that is constrained by what the person actually has and what they can safely eat.
-
-Key behaviors:
-
-- Scan up to five photos in one request.
-- Catch malformed uploads, too-large uploads, and non-JSON error responses gracefully.
-- Store custom typed allergies alongside preset allergies.
-- Block unsafe ingredients before generation and reject unsafe recipes after generation.
-- Use a low-effort model configuration for faster recipe generation.
-- Support passwordless passkeys instead of a traditional sign-in flow.
-- Provide a responsive mobile and desktop kitchen workflow.
-
-## Link to your build
 PASTE_DEPLOYED_BUILD_URL_HERE
 
-## Design doc (optional)
-Not attached yet. This text can be used as the source material for a self-contained HTML design doc.
+Design doc
 
-## Is this a remix?
+No design doc attached.
+
+Is this a remix?
+
 No
 
-## Built With
+Built With
+
 Claude, Next.js, React, Tailwind CSS, Anthropic API, SimpleWebAuthn, Neon Postgres

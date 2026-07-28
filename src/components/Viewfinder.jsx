@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import AmbientField from "@/components/AmbientField";
 
 const MAX_SHOTS = 5;
 
@@ -52,11 +53,19 @@ export default function Viewfinder({ onImage, busy }) {
       onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
       onDragLeave={() => setDragging(false)}
       onDrop={(e) => { e.preventDefault(); setDragging(false); read(e.dataTransfer.files); }}
-      className={`relative border transition-colors duration-300 ${
+      className={`relative isolate overflow-hidden border transition-colors duration-300 ${
         dragging ? "border-cream/60 bg-cream/5" : "border-line bg-char"
       }`}
     >
-      <div className="flex flex-col items-center px-6 py-16 text-center sm:py-24">
+      <AmbientField className="pointer-events-none absolute inset-0 z-0 opacity-70" />
+      <div className="pointer-events-none absolute inset-6 z-0 border border-cream/10 sm:inset-10">
+        <span className="absolute -top-px -left-px h-8 w-8 border-t border-l border-cream/50" />
+        <span className="absolute -top-px -right-px h-8 w-8 border-t border-r border-cream/50" />
+        <span className="absolute -bottom-px -left-px h-8 w-8 border-b border-l border-cream/50" />
+        <span className="absolute -right-px -bottom-px h-8 w-8 border-r border-b border-cream/50" />
+      </div>
+      {busy && <div className="pointer-events-none absolute inset-x-10 top-1/2 z-10 h-px animate-pulse bg-ember/80" />}
+      <div className="relative z-20 flex flex-col items-center px-6 py-16 text-center sm:py-24">
         <button
           type="button"
           disabled={busy || full}
