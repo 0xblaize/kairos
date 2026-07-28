@@ -12,7 +12,22 @@ export default function Viewfinder({ onImage, busy }) {
     const reader = new FileReader();
     reader.onload = () => {
       const url = String(reader.result);
-      onImage({ dataUrl: url, base64: url.split(",")[1], mediaType: file.type });
+      const img = new window.Image();
+      img.onload = () => {
+        // A modern phone photo base64-encodes to several megabytes, which the
+        // vision request cannot carry. 1280px on the long edge is plenty to
+        // recognise groceries.
+        const scale = Math.min(1, 1280 / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        const jpeg = canvas.toDataURL("image/jpeg", 0.82);
+        onImage({ dataUrl: jpeg, base64: jpeg.split(",")[1], mediaType: "image/jpeg" });
+      };
+      img.onerror = () =>
+        onImage({ dataUrl: url, base64: url.split(",")[1], mediaType: file.type });
+      img.src = url;
     };
     reader.readAsDataURL(file);
   };

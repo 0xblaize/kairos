@@ -21,10 +21,23 @@ const DEMO = [
 
 export async function POST(request) {
   try {
-    const { image, mediaType } = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return Response.json({ error: "That upload was malformed." }, { status: 400 });
+    }
+
+    const { image, mediaType } = body;
 
     if (!image) {
       return Response.json({ error: "No image supplied." }, { status: 400 });
+    }
+
+    // Anthropic rejects images over ~5MB; fail with a readable message rather
+    // than letting the upstream call blow up.
+    if (image.length > 7_000_000) {
+      return Response.json({ error: "That photo is too large. Try a smaller one." }, { status: 413 });
     }
 
     if (!hasKey()) {

@@ -35,19 +35,39 @@ export default function KitchenPage() {
 
   if (!hydrated) return null;
 
+  // A crashed route, a 413 on a large photo, or a proxy redirect returns HTML
+  // rather than JSON. Reading as text first turns that into a readable status
+  // instead of "Unexpected end of JSON input".
+  const postJson = async (url, body) => {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    const raw = await res.text();
+    let data = null;
+    try {
+      data = raw ? JSON.parse(raw) : null;
+    } catch {
+      throw new Error(
+        res.status === 413
+          ? "That photo is too large. Try a smaller one."
+          : `Server error (${res.status}). Try again.`
+      );
+    }
+
+    if (!res.ok) throw new Error(data?.error || `Request failed (${res.status}).`);
+    return data;
+  };
+
   const scan = async ({ dataUrl, base64, mediaType }) => {
     setPhoto(dataUrl);
     setRecipe(null);
     setError(null);
     setBusy("scan");
     try {
-      const res = await fetch("/api/vision", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ image: base64, mediaType }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      const data = await postJson("/api/vision", { image: base64, mediaType });
       if (data.demo) setDemo(true);
       if (!data.ingredients?.length) {
         setError("No food found in that photo. Try a wider shot with more light.");
@@ -66,16 +86,10 @@ export default function KitchenPage() {
     setError(null);
     setBusy("recipe");
     try {
-      const res = await fetch("/api/recipe", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          ingredients: entries.filter((e) => e.safe).map((e) => e.name),
-          profile,
-        }),
+      const data = await postJson("/api/recipe", {
+        ingredients: entries.filter((e) => e.safe).map((e) => e.name),
+        profile,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
       if (data.demo) setDemo(true);
       setRecipe(data.recipe);
     } catch (e) {

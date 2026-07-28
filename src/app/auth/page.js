@@ -12,8 +12,19 @@ async function post(url, body) {
     headers: { "content-type": "application/json" },
     body: JSON.stringify(body || {}),
   });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Something went wrong.");
+
+  // A crashed route or a proxy redirect returns HTML, not JSON — reading the
+  // body as text first keeps the real status visible instead of surfacing a
+  // "Unexpected end of JSON input" parse error.
+  const raw = await res.text();
+  let data = null;
+  try {
+    data = raw ? JSON.parse(raw) : null;
+  } catch {
+    throw new Error(`Server error (${res.status}). Try again.`);
+  }
+
+  if (!res.ok) throw new Error(data?.error || `Something went wrong (${res.status}).`);
   return data;
 }
 
