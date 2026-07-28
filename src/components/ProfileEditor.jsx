@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ALLERGENS, DIETS } from "@/lib/diet";
 import { useProfile } from "@/context/ProfileContext";
@@ -8,8 +8,19 @@ import { LogoMark } from "@/components/Logo";
 
 export default function ProfileEditor({ mode = "onboarding" }) {
   const router = useRouter();
-  const { profile, hydrated, setDiet, toggleAllergy, completeOnboarding } = useProfile();
+  const {
+    profile,
+    hydrated,
+    setDiet,
+    toggleAllergy,
+    addCustomAllergy,
+    removeCustomAllergy,
+    completeOnboarding,
+  } = useProfile();
   const [step, setStep] = useState(mode === "onboarding" ? 0 : 1);
+  const [typing, setTyping] = useState(false);
+  const [draft, setDraft] = useState("");
+  const customRef = useRef(null);
 
   if (!hydrated) return null;
 
@@ -17,6 +28,18 @@ export default function ProfileEditor({ mode = "onboarding" }) {
   const showDiet = !isOnboarding || step === 0;
   const showAllergy = !isOnboarding || step === 1;
   const AllergyHeading = isOnboarding ? "h1" : "h2";
+
+  const openCustom = () => {
+    setTyping(true);
+    requestAnimationFrame(() => customRef.current?.focus());
+  };
+
+  const commitCustom = () => {
+    if (!draft.trim()) return setTyping(false);
+    addCustomAllergy(draft);
+    setDraft("");
+    customRef.current?.focus();
+  };
 
   const finish = () => {
     completeOnboarding();
@@ -116,7 +139,65 @@ export default function ProfileEditor({ mode = "onboarding" }) {
               })}
             </div>
 
-            {profile.allergies.length > 0 && (
+            {!typing ? (
+              <button
+                type="button"
+                onClick={openCustom}
+                className="mt-3 flex w-full items-center justify-center gap-2 border border-dashed border-line px-4 py-3.5 text-[11px] tracking-[0.25em] text-cream/50 uppercase transition-all duration-300 hover:border-cream/40 hover:text-cream"
+              >
+                <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+                  <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" strokeWidth="2" />
+                  <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" strokeWidth="2" />
+                </svg>
+                Add another allergy
+              </button>
+            ) : (
+              <div className="mt-3 flex gap-2">
+                <input
+                  ref={customRef}
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") { e.preventDefault(); commitCustom(); }
+                    if (e.key === "Escape") { setDraft(""); setTyping(false); }
+                  }}
+                  onBlur={() => !draft.trim() && setTyping(false)}
+                  placeholder="Type an allergy, e.g. sesame"
+                  maxLength={40}
+                  className="min-w-0 flex-1 border border-cream/40 bg-transparent px-4 py-3.5 text-sm outline-none transition-colors placeholder:text-cream/25 focus:border-cream"
+                />
+                <button
+                  type="button"
+                  onClick={commitCustom}
+                  disabled={!draft.trim()}
+                  className="shrink-0 border border-cream px-5 py-3.5 text-[11px] tracking-[0.25em] uppercase transition duration-300 hover:bg-cream hover:text-void disabled:cursor-not-allowed disabled:opacity-30"
+                >
+                  Add
+                </button>
+              </div>
+            )}
+
+            {profile.customAllergies.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {profile.customAllergies.map((term) => (
+                  <button
+                    key={term}
+                    type="button"
+                    onClick={() => removeCustomAllergy(term)}
+                    aria-label={`Remove ${term}`}
+                    className="group flex items-center gap-2 border border-alarm/70 bg-alarm/8 px-3.5 py-2 text-sm text-alarm transition-colors hover:border-alarm"
+                  >
+                    <span>{term}</span>
+                    <svg viewBox="0 0 24 24" className="h-3 w-3 shrink-0 opacity-50 transition-opacity group-hover:opacity-100">
+                      <line x1="5" y1="5" x2="19" y2="19" stroke="currentColor" strokeWidth="2.5" />
+                      <line x1="19" y1="5" x2="5" y2="19" stroke="currentColor" strokeWidth="2.5" />
+                    </svg>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {(profile.allergies.length > 0 || profile.customAllergies.length > 0) && (
               <p className="mt-6 flex items-start gap-3 border border-alarm/20 bg-alarm/5 px-4 py-3 text-xs leading-relaxed text-cream/70">
                 <span aria-hidden="true" className="mt-0.5 shrink-0 grayscale">🛡</span>
                 Kairos will never include these. If the scan finds one, it is flagged and dropped before anything is generated.
@@ -152,7 +233,9 @@ export default function ProfileEditor({ mode = "onboarding" }) {
                 onClick={finish}
                 className="flex-1 border border-cream px-8 py-4 text-[11px] tracking-[0.3em] uppercase transition duration-300 hover:bg-cream hover:text-void"
               >
-                {profile.allergies.length ? "Save and start cooking" : "No allergies — continue"}
+                {profile.allergies.length || profile.customAllergies.length
+                  ? "Save and start cooking"
+                  : "No allergies — continue"}
               </button>
             </>
           )}

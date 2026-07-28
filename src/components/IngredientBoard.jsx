@@ -7,9 +7,11 @@ function Pill({ entry, onRemove }) {
   const unsafe = !entry.safe;
   const reason = entry.allergens.length
     ? `Contains ${entry.allergens.map(allergenLabel).join(", ").toLowerCase()}`
-    : entry.dietConflict
-      ? `Not ${dietLabel(entry.dietConflict).toLowerCase()}`
-      : null;
+    : entry.custom?.length
+      ? `Contains ${entry.custom.join(", ")}`
+      : entry.dietConflict
+        ? `Not ${dietLabel(entry.dietConflict).toLowerCase()}`
+        : null;
 
   return (
     <span
@@ -92,7 +94,9 @@ export default function IngredientBoard({ entries, onRemove, onAdd, onGenerate, 
                 {" — "}
                 {b.allergens.length
                   ? `detected, excluded due to your ${b.allergens.map(allergenLabel).join(" and ").toLowerCase()} allergy.`
-                  : `excluded — not ${dietLabel(b.dietConflict).toLowerCase()}.`}
+                  : b.custom?.length
+                    ? `detected, excluded due to your ${b.custom.join(" and ")} allergy.`
+                    : `excluded — not ${dietLabel(b.dietConflict).toLowerCase()}.`}
               </li>
             ))}
           </ul>

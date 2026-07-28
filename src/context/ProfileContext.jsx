@@ -7,6 +7,7 @@ const STORAGE_KEY = "kairos.profile.v1";
 const DEFAULT_PROFILE = {
   diet: "none",
   allergies: [],
+  customAllergies: [],
   onboarded: false,
 };
 
@@ -48,6 +49,17 @@ export function ProfileProvider({ children }) {
             : [...p.allergies, id],
         })),
       completeOnboarding: () => setProfile((p) => ({ ...p, onboarded: true })),
+      addCustomAllergy: (raw) =>
+        setProfile((p) => {
+          const term = String(raw).toLowerCase().trim().slice(0, 40);
+          if (!term || p.customAllergies.includes(term)) return p;
+          return { ...p, customAllergies: [...p.customAllergies, term] };
+        }),
+      removeCustomAllergy: (term) =>
+        setProfile((p) => ({
+          ...p,
+          customAllergies: p.customAllergies.filter((t) => t !== term),
+        })),
       reset: () => setProfile(DEFAULT_PROFILE),
     }),
     [profile, hydrated]

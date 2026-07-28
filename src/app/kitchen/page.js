@@ -61,16 +61,18 @@ export default function KitchenPage() {
     return data;
   };
 
-  const scan = async ({ dataUrl, base64, mediaType }) => {
-    setPhoto(dataUrl);
+  const scan = async (shots) => {
+    setPhoto(shots[0].dataUrl);
     setRecipe(null);
     setError(null);
     setBusy("scan");
     try {
-      const data = await postJson("/api/vision", { image: base64, mediaType });
+      const data = await postJson("/api/vision", {
+        images: shots.map((s) => ({ image: s.base64, mediaType: s.mediaType })),
+      });
       if (data.demo) setDemo(true);
       if (!data.ingredients?.length) {
-        setError("No food found in that photo. Try a wider shot with more light.");
+        setError("No food found in those photos. Try a wider shot with more light.");
         setEntries([]);
       } else {
         setEntries(screenAll(data.ingredients, profile));

@@ -5,7 +5,10 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 function buildSystem(profile, safeNames) {
-  const allergies = (profile.allergies || []).map(allergenLabel);
+  const allergies = [
+    ...(profile.allergies || []).map(allergenLabel),
+    ...(profile.customAllergies || []),
+  ];
 
   const lines = [
     "You are a precise, practical home-cooking chef.",
@@ -109,6 +112,7 @@ export async function POST(request) {
     const text = await callClaude({
       system: buildSystem(profile, safe),
       maxTokens: 6000,
+      effort: "low",
       messages: [
         {
           role: "user",

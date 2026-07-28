@@ -28,16 +28,31 @@ export async function POST(request) {
       return Response.json({ error: "That upload was malformed." }, { status: 400 });
     }
 
-    const { image, mediaType } = body;
+    const { image, mediaType, images } = body;
 
-    if (!image) {
+    // Accept either a single image or a batch; normalise to one list.
+    const shots = Array.isArray(images) && images.length
+      ? images
+      : image
+        ? [{ image, mediaType }]
+        : [];
+
+    if (!shots.length) {
       return Response.json({ error: "No image supplied." }, { status: 400 });
+    }
+
+    if (shots.length > 5) {
+      return Response.json({ error: "Up to 5 photos per scan." }, { status: 400 });
     }
 
     // Anthropic rejects images over ~5MB; fail with a readable message rather
     // than letting the upstream call blow up.
-    if (image.length > 7_000_000) {
-      return Response.json({ error: "That photo is too large. Try a smaller one." }, { status: 413 });
+    const total = shots.reduce((n, s) => n + (s.image?.length || 0), 0);
+    if (total > 7_000_000) {
+      return Response.json(
+        { error: "Those photos are too large. Try fewer, or smaller ones." },
+        { status: 413 }
+      );
     }
 
     if (!hasKey()) {
@@ -52,15 +67,21 @@ export async function POST(request) {
         {
           role: "user",
           content: [
-            {
+            ...shots.map((s) => ({
               type: "image",
               source: {
                 type: "base64",
-                media_type: mediaType || "image/jpeg",
-                data: image,
+                media_type: s.mediaType || "image/jpeg",
+                data: s.image,
               },
+            })),
+            {
+              type: "text",
+              text:
+                shots.length > 1
+                  ? `Identify every food item across all ${shots.length} images. Merge them into one combined list, without duplicates.`
+                  : "Identify every food item in this image.",
             },
-            { type: "text", text: "Identify every food item in this image." },
           ],
         },
       ],
