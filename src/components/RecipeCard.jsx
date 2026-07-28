@@ -5,59 +5,42 @@ export default function RecipeCard({ recipe, onStart, onRescan }) {
   const m = recipe.macros || {};
 
   return (
-    <section className="rise overflow-hidden rounded-[2rem] border border-line bg-gradient-to-b from-elev to-char">
-      <div className="border-b border-line px-6 py-7 sm:px-8">
-        <p className="text-xs tracking-[0.22em] text-cream/60 uppercase">Kairos choice</p>
-        <h2 className="font-display mt-2.5 text-4xl leading-tight sm:text-5xl">
+    <section className="rise border border-line">
+      <div className="border-b border-line px-6 py-8 sm:px-8">
+        <p className="text-[10px] tracking-[0.5em] text-cream/40 uppercase">Kairos choice</p>
+        <h2 className="font-display mt-4 text-4xl font-normal leading-tight sm:text-5xl">
           {recipe.title}
         </h2>
         {recipe.description && (
-          <p className="mt-3 max-w-lg text-fog">{recipe.description}</p>
+          <p className="mt-3 max-w-lg text-sm leading-relaxed text-cream/50">{recipe.description}</p>
         )}
-
-        <div className="mt-6 flex flex-wrap gap-x-7 gap-y-3 text-sm">
-          <span>
-            <span className="text-fog">Prep </span>
-            {recipe.prepMinutes}m
-          </span>
-          <span>
-            <span className="text-fog">Cook </span>
-            {recipe.cookMinutes}m
-          </span>
-          <span>
-            <span className="text-fog">Total </span>
-            {total}m
-          </span>
-          <span>
-            <span className="text-fog">Serves </span>
-            {recipe.servings}
-          </span>
+        <div className="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-xs tracking-[0.2em] text-cream/60 uppercase">
+          <span>Prep {recipe.prepMinutes}m</span>
+          <span>Cook {recipe.cookMinutes}m</span>
+          <span>Total {total}m</span>
+          <span>Serves {recipe.servings}</span>
         </div>
       </div>
 
       <div className="grid grid-cols-4 divide-x divide-line border-b border-line">
-        {[
-          ["Calories", m.calories, ""],
-          ["Protein", m.protein, "g"],
-          ["Carbs", m.carbs, "g"],
-          ["Fat", m.fat, "g"],
-        ].map(([label, value, unit]) => (
-          <div key={label} className="px-3 py-5 text-center">
-            <p className="font-display text-2xl">
-              {value ?? "—"}
-              <span className="text-base text-fog">{unit}</span>
-            </p>
-            <p className="mt-1 text-[11px] tracking-wider text-fog uppercase">{label}</p>
-          </div>
-        ))}
+        {[["Cal", m.calories, ""], ["Protein", m.protein, "g"], ["Carbs", m.carbs, "g"], ["Fat", m.fat, "g"]].map(
+          ([label, value, unit]) => (
+            <div key={label} className="px-3 py-5 text-center">
+              <p className="font-display text-2xl font-normal">
+                {value ?? "—"}<span className="text-sm text-cream/40">{unit}</span>
+              </p>
+              <p className="mt-1 text-[10px] tracking-[0.3em] text-cream/40 uppercase">{label}</p>
+            </div>
+          )
+        )}
       </div>
 
       {recipe.ingredients?.length > 0 && (
-        <ul className="divide-y divide-line/60 px-6 sm:px-8">
+        <ul className="divide-y divide-line/50 px-6 sm:px-8">
           {recipe.ingredients.map((ing, i) => (
-            <li key={i} className="flex items-baseline justify-between gap-6 py-3">
+            <li key={i} className="flex items-baseline justify-between gap-6 py-3 text-sm">
               <span className="capitalize">{ing.item}</span>
-              <span className="shrink-0 text-sm text-fog">{ing.amount}</span>
+              <span className="shrink-0 text-cream/40">{ing.amount}</span>
             </li>
           ))}
         </ul>
@@ -67,14 +50,14 @@ export default function RecipeCard({ recipe, onStart, onRescan }) {
         <button
           type="button"
           onClick={onStart}
-          className="flex-1 rounded-full bg-cream px-8 py-4 text-lg font-medium text-void transition-transform hover:scale-[1.01] active:scale-95"
+          className="flex-1 border border-cream px-8 py-4 text-[11px] tracking-[0.3em] uppercase transition duration-300 hover:bg-cream hover:text-void"
         >
           Start cooking
         </button>
         <button
           type="button"
           onClick={onRescan}
-          className="rounded-full border border-line px-7 py-4 text-fog transition-colors hover:text-cream"
+          className="border border-line px-7 py-4 text-[11px] tracking-[0.3em] text-cream/50 uppercase transition duration-300 hover:border-cream/40 hover:text-cream"
         >
           Scan again
         </button>

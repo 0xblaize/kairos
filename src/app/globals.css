@@ -42,7 +42,7 @@ html.lenis body {
 }
 
 ::selection {
-  background-color: var(--color-saffron);
+  background-color: var(--color-cream);
   color: var(--color-void);
 }
 
@@ -127,6 +127,26 @@ html.lenis body {
   .animation-orbit {
     animation-name: kairos-orbit;
   }
+}
+
+@keyframes kairos-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.07);
+    opacity: 1;
+  }
+}
+
+.breathe-mark {
+  animation: kairos-breathe 6s ease-in-out infinite;
+}
+
+.pulse-mark {
+  animation: kairos-breathe 1.3s ease-in-out infinite;
 }
 
 @keyframes kairos-spin {

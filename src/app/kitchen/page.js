@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Logo from "@/components/Logo";
+import { LogoMark } from "@/components/Logo";
 import ShieldCluster from "@/components/ShieldCluster";
 import Viewfinder from "@/components/Viewfinder";
 import IngredientBoard from "@/components/IngredientBoard";
@@ -27,7 +27,6 @@ export default function KitchenPage() {
     if (hydrated && !profile.onboarded) router.replace("/onboarding");
   }, [hydrated, profile.onboarded, router]);
 
-  // Restrictions can change mid-session; re-screen so pills never go stale.
   useEffect(() => {
     setEntries((prev) =>
       prev ? screenAll(prev.map((e) => e.name), profile) : prev
@@ -98,48 +97,51 @@ export default function KitchenPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-5 py-6 pb-24">
-      <header className="flex items-center justify-between gap-4">
-        <Logo />
-        <ShieldCluster />
+    <div className="relative min-h-dvh w-full bg-void text-cream">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-line/50 bg-void/90 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-5">
+          <a href="/" className="flex items-center gap-3">
+            <LogoMark className="h-6 w-6" />
+            <span className="font-display text-lg tracking-[0.3em] uppercase">Kairos</span>
+          </a>
+          <ShieldCluster />
+        </div>
       </header>
 
-      <h1 className="font-display mt-12 text-4xl leading-tight sm:text-5xl">
-        What are we cooking today?
-      </h1>
+      <main className="mx-auto w-full max-w-3xl px-6 pt-28 pb-24">
+        <div className="mb-10">
+          <p className="text-[10px] tracking-[0.5em] text-cream/40 uppercase">Kitchen</p>
+          <h1 className="font-display mt-3 text-4xl font-normal leading-tight sm:text-5xl">
+            What are we cooking?
+          </h1>
+        </div>
 
-      {demo && (
-        <p className="mt-4 rounded-xl border border-line bg-elev/60 px-4 py-2.5 text-sm text-fog">
-          Demo mode — set <code className="text-cream">ANTHROPIC_API_KEY</code> in{" "}
-          <code className="text-cream">.env.local</code> for live scanning.
-        </p>
-      )}
+        {demo && (
+          <p className="mb-6 border border-line px-4 py-3 text-xs text-cream/50">
+            Demo mode — add <code className="text-cream/80">ANTHROPIC_API_KEY</code> to{" "}
+            <code className="text-cream/80">.env.local</code> for live scanning.
+          </p>
+        )}
 
-      {error && (
-        <p className="mt-4 rounded-xl border border-alarm/40 bg-alarm/5 px-4 py-3 text-sm text-alarm">
-          {error}
-        </p>
-      )}
+        {error && (
+          <p className="mb-6 border border-alarm/40 bg-alarm/5 px-4 py-3 text-sm text-alarm">
+            {error}
+          </p>
+        )}
 
-      <div className="mt-7">
         {!entries ? (
           <Viewfinder onImage={scan} busy={busy === "scan"} />
         ) : (
           <div className="space-y-10">
             {photo && (
-              <div className="flex items-center gap-4 rounded-2xl border border-line bg-elev/40 p-3">
-                {/* User's own capture, sized by the container — next/image adds no value here. */}
+              <div className="flex items-center gap-4 border border-line bg-elev/30 p-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={photo}
-                  alt="Your scan"
-                  className="h-16 w-16 rounded-xl object-cover"
-                />
-                <p className="text-sm text-fog">Scanned just now</p>
+                <img src={photo} alt="Your scan" className="h-14 w-14 object-cover" />
+                <p className="text-xs tracking-wide text-cream/50">Scanned just now</p>
                 <button
                   type="button"
                   onClick={reset}
-                  className="ml-auto text-sm text-fog underline underline-offset-4 hover:text-cream"
+                  className="ml-auto text-xs tracking-[0.2em] text-cream/40 uppercase underline underline-offset-4 transition-colors hover:text-cream"
                 >
                   New scan
                 </button>
@@ -151,9 +153,7 @@ export default function KitchenPage() {
                 entries={entries}
                 busy={busy === "recipe"}
                 onRemove={(i) => setEntries((p) => p.filter((_, x) => x !== i))}
-                onAdd={(name) =>
-                  setEntries((p) => [...p, screenIngredient(name, profile)])
-                }
+                onAdd={(name) => setEntries((p) => [...p, screenIngredient(name, profile)])}
                 onGenerate={generate}
               />
             )}
@@ -167,7 +167,7 @@ export default function KitchenPage() {
             )}
           </div>
         )}
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
