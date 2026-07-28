@@ -71,8 +71,24 @@ function buildSystem(profile, safeNames, dish) {
 }
 
 function demoRecipe(safeNames, dish) {
+  if (dish) {
+    return {
+      title: dish.title,
+      description: dish.description,
+      prepMinutes: 10,
+      cookMinutes: 25,
+      servings: 2,
+      macros: { calories: 320, protein: 8, carbs: 48, fat: 9 },
+      ingredients: safeNames.map((item) => ({ item, amount: "as available" })),
+      steps: [
+        { title: "Prepare the ingredients", detail: "Wash, peel, and cut the available ingredients into cooking-size pieces.", minutes: 10 },
+        { title: "Cook the dish", detail: `Cook the prepared ingredients together as a simple version of ${dish.title}, seasoning with salt and pepper to taste.`, minutes: 25 },
+      ],
+    };
+  }
+
   return {
-    title: dish?.title || "Spinach & Feta Frittata",
+    title: "Spinach & Feta Frittata",
     description:
       dish?.description || "A fast, high-protein skillet frittata built from what you already had in the fridge.",
     prepMinutes: 8,
