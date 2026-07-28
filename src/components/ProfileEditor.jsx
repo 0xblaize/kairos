@@ -103,7 +103,7 @@ export default function ProfileEditor({ mode = "onboarding" }) {
                         : "border-line bg-transparent hover:border-cream/30"
                     }`}
                   >
-                    <span className="text-base">{a.glyph}</span>
+                    <span className="text-base grayscale">{a.glyph}</span>
                     <span className="text-sm font-medium">{a.label}</span>
                     {on && (
                       <svg viewBox="0 0 24 24" className="ml-auto h-3.5 w-3.5 shrink-0 text-alarm">
@@ -118,7 +118,7 @@ export default function ProfileEditor({ mode = "onboarding" }) {
 
             {profile.allergies.length > 0 && (
               <p className="mt-6 flex items-start gap-3 border border-alarm/20 bg-alarm/5 px-4 py-3 text-xs leading-relaxed text-cream/70">
-                <span aria-hidden="true" className="mt-0.5 shrink-0">🛡</span>
+                <span aria-hidden="true" className="mt-0.5 shrink-0 grayscale">🛡</span>
                 Kairos will never include these. If the scan finds one, it is flagged and dropped before anything is generated.
               </p>
             )}

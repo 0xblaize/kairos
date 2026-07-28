@@ -92,6 +92,11 @@ export default function KitchenPage() {
     setError(null);
   };
 
+  const signOut = async () => {
+    await fetch("/api/auth/session", { method: "DELETE" });
+    router.replace("/auth");
+  };
+
   if (cooking && recipe) {
     return <CookMode recipe={recipe} onExit={() => setCooking(false)} />;
   }
@@ -99,16 +104,25 @@ export default function KitchenPage() {
   return (
     <div className="relative min-h-dvh w-full bg-void text-cream">
       <header className="fixed inset-x-0 top-0 z-50 border-b border-line/50 bg-void/90 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-5">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-5">
           <a href="/" className="flex items-center gap-3">
             <LogoMark className="h-6 w-6" />
             <span className="font-display text-lg tracking-[0.3em] uppercase">Kairos</span>
           </a>
-          <ShieldCluster />
+          <div className="flex items-center gap-5">
+            <ShieldCluster />
+            <button
+              type="button"
+              onClick={signOut}
+              className="shrink-0 text-[10px] tracking-[0.3em] text-cream/35 uppercase transition-colors hover:text-cream"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl px-6 pt-28 pb-24">
+      <main className="mx-auto w-full max-w-6xl px-6 pt-28 pb-24">
         <div className="mb-10">
           <p className="text-[10px] tracking-[0.5em] text-cream/40 uppercase">Kitchen</p>
           <h1 className="font-display mt-3 text-4xl font-normal leading-tight sm:text-5xl">
@@ -130,41 +144,53 @@ export default function KitchenPage() {
         )}
 
         {!entries ? (
-          <Viewfinder onImage={scan} busy={busy === "scan"} />
+          <div className="mx-auto max-w-3xl">
+            <Viewfinder onImage={scan} busy={busy === "scan"} />
+          </div>
         ) : (
-          <div className="space-y-10">
-            {photo && (
-              <div className="flex items-center gap-4 border border-line bg-elev/30 p-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={photo} alt="Your scan" className="h-14 w-14 object-cover" />
-                <p className="text-xs tracking-wide text-cream/50">Scanned just now</p>
-                <button
-                  type="button"
-                  onClick={reset}
-                  className="ml-auto text-xs tracking-[0.2em] text-cream/40 uppercase underline underline-offset-4 transition-colors hover:text-cream"
-                >
-                  New scan
-                </button>
-              </div>
-            )}
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:items-start lg:gap-14">
+            <div className="space-y-6 lg:sticky lg:top-28">
+              {photo && (
+                <div className="border border-line bg-elev/30 p-3">
+                  <div className="flex items-center gap-4 lg:flex-col lg:items-stretch lg:gap-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={photo}
+                      alt="Your scan"
+                      className="h-14 w-14 shrink-0 object-cover lg:h-52 lg:w-full"
+                    />
+                    <p className="text-xs tracking-wide text-cream/50">Scanned just now</p>
+                    <button
+                      type="button"
+                      onClick={reset}
+                      className="ml-auto shrink-0 text-xs tracking-[0.2em] text-cream/40 uppercase underline underline-offset-4 transition-colors hover:text-cream lg:ml-0 lg:text-left"
+                    >
+                      New scan
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
 
-            {!recipe && (
-              <IngredientBoard
-                entries={entries}
-                busy={busy === "recipe"}
-                onRemove={(i) => setEntries((p) => p.filter((_, x) => x !== i))}
-                onAdd={(name) => setEntries((p) => [...p, screenIngredient(name, profile)])}
-                onGenerate={generate}
-              />
-            )}
+            <div>
+              {!recipe && (
+                <IngredientBoard
+                  entries={entries}
+                  busy={busy === "recipe"}
+                  onRemove={(i) => setEntries((p) => p.filter((_, x) => x !== i))}
+                  onAdd={(name) => setEntries((p) => [...p, screenIngredient(name, profile)])}
+                  onGenerate={generate}
+                />
+              )}
 
-            {recipe && (
-              <RecipeCard
-                recipe={recipe}
-                onStart={() => setCooking(true)}
-                onRescan={reset}
-              />
-            )}
+              {recipe && (
+                <RecipeCard
+                  recipe={recipe}
+                  onStart={() => setCooking(true)}
+                  onRescan={reset}
+                />
+              )}
+            </div>
           </div>
         )}
       </main>

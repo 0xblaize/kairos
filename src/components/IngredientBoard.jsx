@@ -83,7 +83,7 @@ export default function IngredientBoard({ entries, onRemove, onAdd, onGenerate, 
       {blocked.length > 0 && (
         <div className="mt-6 border border-alarm/20 bg-alarm/5 p-4">
           <p className="flex items-center gap-2 text-xs tracking-[0.2em] text-alarm uppercase">
-            <span aria-hidden="true">🛡</span> Excluded by your profile
+            <span aria-hidden="true" className="grayscale">🛡</span> Excluded by your profile
           </p>
           <ul className="mt-3 space-y-2">
             {blocked.map((b, i) => (

@@ -24,7 +24,7 @@ export default function ShieldCluster({ href = "/profile" }) {
               <span
                 key={a.id}
                 title={`No ${a.label}`}
-                className="relative grid h-6 w-6 place-items-center rounded-full border border-line bg-void text-[11px]"
+                className="relative grid h-6 w-6 place-items-center rounded-full border border-line bg-void text-[11px] grayscale"
               >
                 {a.glyph}
                 <span className="absolute inset-0 grid place-items-center text-alarm">
